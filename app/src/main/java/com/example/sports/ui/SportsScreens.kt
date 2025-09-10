@@ -16,6 +16,7 @@
 
 package com.example.sports.ui
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -268,6 +269,7 @@ private fun SportsDetail(
     }
     val scrollState = rememberScrollState()
     val layoutDirection = LocalLayoutDirection.current
+
     Box(
         modifier = modifier
             .verticalScroll(state = scrollState)
@@ -341,6 +343,55 @@ private fun SportsDetail(
         }
     }
 }
+
+@Composable
+fun SportsListAndDetails(
+    sports: List<Sport>,
+    onClick: (Sport) -> Unit,
+    selectedSport: Sport,
+    onBackPressed: () -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier=Modifier
+){
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        SportsList(
+            sports=sports,
+            onClick={},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium),
+                ).weight(1f)
+        )
+        ///val activity = LocalContext.current as Activity
+        SportsDetail(
+            selectedSport = selectedSport,
+            onBackPressed = {  },
+            contentPadding = contentPadding,
+            modifier= Modifier.weight(1f)
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 1000)
+@Composable
+fun SportsListAndDetailsPreview(){
+    SportsTheme {
+        SportsListAndDetails(
+            sports = LocalSportsDataProvider.getSportsData(),
+            onClick = {},
+            selectedSport = LocalSportsDataProvider.defaultSport,
+            onBackPressed = {},
+            contentPadding = PaddingValues(0.dp)
+        )
+    }
+}
+
 
 @Preview
 @Composable
