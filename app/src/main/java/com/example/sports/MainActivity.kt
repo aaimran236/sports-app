@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     val windowSize = calculateWindowSizeClass(this)
                     SportsApp(
-                        windowSize = windowSize.widthSizeClass
+                        windowSize = windowSize.widthSizeClass,
+                        onBackPressed = { finish() }
                     )
                 }
             }

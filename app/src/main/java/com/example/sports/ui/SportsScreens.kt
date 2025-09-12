@@ -81,28 +81,18 @@ import com.example.sports.utils.SportsContentType
 @Composable
 fun SportsApp(
     windowSize: WindowWidthSizeClass,
-    modifier: Modifier = Modifier
+    onBackPressed: () -> Unit,
 ) {
     val viewModel: SportsViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val contentType: SportsContentType
 
-    when(windowSize){
-        WindowWidthSizeClass.Compact -> {
-            contentType = SportsContentType.ListOnly
-        }
-        WindowWidthSizeClass.Medium -> {
+    val contentType = when (windowSize) {
+        WindowWidthSizeClass.Compact,
+        WindowWidthSizeClass.Medium -> SportsContentType.ListOnly
 
-            contentType = SportsContentType.ListOnly
-        }
-        WindowWidthSizeClass.Expanded -> {
+        WindowWidthSizeClass.Expanded -> SportsContentType.ListAndDetail
 
-            contentType = SportsContentType.ListAndDetail
-        }
-        else -> {
-
-            contentType = SportsContentType.ListOnly
-        }
+        else -> SportsContentType.ListOnly
     }
 
     Scaffold(
@@ -114,17 +104,19 @@ fun SportsApp(
             )
         }
     ) { innerPadding ->
-        val activity = LocalContext.current as Activity
+        ///val activity = LocalContext.current as Activity
         if (contentType== SportsContentType.ListAndDetail){
             SportsListAndDetails(
-                uiState=uiState,
+                ///uiState=uiState,
+                sports = uiState.sportsList,
+                selectedSport = uiState.currentSport,
                 onClick = {
                     viewModel.updateCurrentSport(it)
                     viewModel.navigateToDetailPage()
                 },
-                onBackPressed = {activity.finish()},
+                onBackPressed = onBackPressed,
                 contentPadding = innerPadding,
-                modifier = modifier
+                modifier = Modifier.fillMaxWidth()
             )
         }else {
             if (uiState.isShowingListPage) {
@@ -386,51 +378,54 @@ private fun SportsDetail(
 
 @Composable
 fun SportsListAndDetails(
-    uiState: SportsUiState,
+    ///uiState: SportsUiState,
+    sports: List<Sport>,
+    selectedSport: Sport,
     onClick: (Sport) -> Unit,
     onBackPressed: () -> Unit,
-    contentPadding: PaddingValues,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier=Modifier
 ){
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        ///horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         SportsList(
-            sports=uiState.sportsList,
-            onClick=onClick,
+            sports = sports,
+            onClick = onClick,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = dimensionResource(R.dimen.padding_medium),
-                    start = dimensionResource(R.dimen.padding_medium),
-                    end = dimensionResource(R.dimen.padding_medium),
-                ).weight(1f),
-            contentPadding=contentPadding
+                .weight(2f)
+                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding()
+            )
         )
 
         SportsDetail(
-            selectedSport = uiState.currentSport,
+            selectedSport = selectedSport,
             onBackPressed = onBackPressed,
-            contentPadding = contentPadding,
-            modifier= Modifier.weight(1f)
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding(),
+            ),
+            modifier = Modifier.weight(3f)
         )
     }
 }
 
-//@Preview(showBackground = true, widthDp = 1000)
-//@Composable
-//fun SportsListAndDetailsPreview(){
-//    SportsTheme {
-//        SportsListAndDetails(
-//            sports = LocalSportsDataProvider.getSportsData(),
-//            onClick = {},
-//            selectedSport = LocalSportsDataProvider.defaultSport,
-//            onBackPressed = {},
-//            contentPadding = PaddingValues(0.dp)
-//        )
-//    }
-//}
+@Preview(showBackground = true, widthDp = 1000)
+@Composable
+fun SportsListAndDetailsPreview(){
+    SportsTheme {
+        SportsListAndDetails(
+            sports = LocalSportsDataProvider.getSportsData(),
+            onClick = {},
+            selectedSport = LocalSportsDataProvider.getSportsData().getOrElse(0) {
+                LocalSportsDataProvider.defaultSport
+            },
+            onBackPressed = {}
+        )
+    }
+}
 
 
 @Preview
