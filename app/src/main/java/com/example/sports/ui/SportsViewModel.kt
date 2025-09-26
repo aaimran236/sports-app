@@ -46,7 +46,9 @@ class SportsViewModel : ViewModel() {
 
     fun navigateToListPage() {
         _uiState.update {
-            it.copy(isShowingListPage = true)
+            it.copy(
+                currentSport = LocalSportsDataProvider.defaultSport,
+                isShowingListPage = true)
         }
     }
 

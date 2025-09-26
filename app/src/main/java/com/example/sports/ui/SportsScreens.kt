@@ -122,18 +122,14 @@ fun SportsApp(
             if (uiState.isShowingListPage) {
                 SportsList(
                     sports = uiState.sportsList,
+                    selectedSport = uiState.currentSport,
+                    contentType=contentType,
                     onClick = {
                         viewModel.updateCurrentSport(it)
                         viewModel.navigateToDetailPage()
                     },
                     contentPadding = innerPadding,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = dimensionResource(R.dimen.padding_medium),
-                            start = dimensionResource(R.dimen.padding_medium),
-                            end = dimensionResource(R.dimen.padding_medium),
-                        )
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium)),
                 )
             } else {
                 SportsDetail(
@@ -193,12 +189,20 @@ fun SportsAppBar(
 @Composable
 private fun SportsListItem(
     sport: Sport,
+    selected: Boolean,
     onItemClick: (Sport) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         elevation = CardDefaults.cardElevation(),
         modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            }
+        ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.card_corner_radius)),
         onClick = { onItemClick(sport) }
     ) {
@@ -271,6 +275,8 @@ private fun SportsListImageItem(sport: Sport, modifier: Modifier = Modifier) {
 @Composable
 private fun SportsList(
     sports: List<Sport>,
+    selectedSport: Sport,
+    contentType: SportsContentType,
     onClick: (Sport) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -278,11 +284,13 @@ private fun SportsList(
     LazyColumn(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
-        modifier = modifier,
+        modifier = modifier.padding(top = dimensionResource(R.dimen.padding_medium)),
     ) {
         items(sports, key = { sport -> sport.id }) { sport ->
             SportsListItem(
                 sport = sport,
+                selected = if (contentType == SportsContentType.ListAndDetail) selectedSport.id == sport.id
+                else false,
                 onItemClick = onClick
             )
         }
@@ -393,19 +401,21 @@ fun SportsListAndDetails(
         SportsList(
             sports = sports,
             onClick = onClick,
+            selectedSport = selectedSport,
+            contentType = SportsContentType.ListAndDetail,
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding(),
+            ),
             modifier = Modifier
                 .weight(2f)
-                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
-            contentPadding = PaddingValues(
-                top = contentPadding.calculateTopPadding()
-            )
+                .padding(horizontal = dimensionResource(R.dimen.padding_medium))
         )
 
         SportsDetail(
             selectedSport = selectedSport,
             onBackPressed = onBackPressed,
             contentPadding = PaddingValues(
-                top = contentPadding.calculateTopPadding(),
+                top = contentPadding.calculateTopPadding()
             ),
             modifier = Modifier.weight(3f)
         )
@@ -434,6 +444,7 @@ fun SportsListItemPreview() {
     SportsTheme {
         SportsListItem(
             sport = LocalSportsDataProvider.defaultSport,
+            selected = false,
             onItemClick = {}
         )
     }
@@ -446,6 +457,10 @@ fun SportsListPreview() {
         Surface {
             SportsList(
                 sports = LocalSportsDataProvider.getSportsData(),
+                selectedSport = LocalSportsDataProvider.getSportsData().getOrElse(0) {
+                    LocalSportsDataProvider.defaultSport
+                },
+                contentType = SportsContentType.ListOnly,
                 onClick = {},
             )
         }
