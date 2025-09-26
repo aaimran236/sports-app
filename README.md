@@ -32,7 +32,7 @@ This project reinforces several concepts from the **Android Basics in Compose** 
 <img width="300" height="852" alt="Screenshot 2025-09-12 200847" src="https://github.com/user-attachments/assets/2fcc0a1d-464b-4372-bd75-7d2c9531e39a" />
 
 ### Tablet View (Expanded)
-<img width="1369" height="860" alt="Screenshot 2025-09-12 212912" src="https://github.com/user-attachments/assets/3feaa200-3512-4c1f-a22a-1290bf65f3e8" />
+<img width="1407" height="876" alt="Screenshot 2025-09-26 091922" src="https://github.com/user-attachments/assets/edc1b8b9-c009-40de-b43b-5c99ab3ab394" />
 
 
 ## ⚙️ Installation
